@@ -1,0 +1,37 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - nocodbUrl
+      - nocodbApiToken
+      - nocodbBaseId
+    properties:
+      nocodbUrl:
+        type: string
+        description: The base URL for the Nocodb instance.
+      nocodbApiToken:
+        type: string
+        description: The API token for authenticating with the Nocodb instance.
+      nocodbBaseId:
+        type: string
+        description: The base ID from the Nocodb instance.
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({
+      command: 'node',
+      args: ['dist/start.js'],
+      env: {
+        NOCODB_URL: config.nocodbUrl,
+        NOCODB_API_TOKEN: config.nocodbApiToken,
+        NOCODB_BASE_ID: config.nocodbBaseId
+      }
+    })
+  exampleConfig:
+    nocodbUrl: https://your-nocodb-instance.com
+    nocodbApiToken: your_api_token_here
+    nocodbBaseId: your_base_id_here
