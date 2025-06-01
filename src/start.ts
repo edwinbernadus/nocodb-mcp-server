@@ -399,12 +399,28 @@ const response = await postRecords("Shinobi", {
             rowId: z.number(),
             data: z.any().describe(`The data to be updated in the table.
 [WARNING] The structure of this object should match the columns of the table.
+[WARNING] Do not use JavaScript-style Object with Stringified Data
 example:
 const response = await patchRecords("Shinobi", 2, {
             Title: "sasuke-updated"
 })`)
         },
         async ({tableName, rowId, data}) => {
+            if (typeof data === 'string'){
+                try {
+                    data = JSON.parse(data);
+                } catch (e) {
+                    return {
+                        content: [{
+                            type: 'text',
+                            mimeType: 'application/json',
+                            text: JSON.stringify({
+                                error: "Data must be a valid JSON object or stringified JSON object"
+                            }),
+                        }],
+                    }
+                }
+            }
             const response = await patchRecords(tableName, rowId, data)
             return {
                 content: [{
