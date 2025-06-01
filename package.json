@@ -1,6 +1,6 @@
 {
   "name": "nocodb-mcp-server",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "Model Context Protocol server for nocodb",
   "scripts": {
     "build": "tsc"
