@@ -79,3 +79,27 @@ Column input is columnId
 const response = await deleteColumn("c7uo2ruwc053a3a")
 ```
 
+### 9. List Linked Records
+
+Retrieve list of linked records for a specific Link field and Record ID.
+
+```typescript
+const response = await listLinkedRecords("tableId", "linkFieldId", "recordId", "field1,field2");
+```
+
+### 10. Create Link Between Records
+
+Link records to a specific Link field and Record ID. Existing links will be unaffected.
+
+```typescript
+const response = await createLink("tableId", "linkFieldId", "recordId", [4, 5, 6]);
+```
+
+### 11. Delete Link Between Records
+
+Unlink records from a specific Link field and Record ID. Duplicated and non-existent record IDs will be ignored.
+
+```typescript
+const response = await deleteLink("tableId", "linkFieldId", "recordId", [1, 2, 3]);
+```
+
