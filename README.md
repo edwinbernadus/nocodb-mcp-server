@@ -1,6 +1,6 @@
-[![MseeP Badge](https://mseep.net/pr/edwinbernadus-nocodb-mcp-server-badge.jpg)](https://mseep.ai/app/edwinbernadus-nocodb-mcp-server)
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/edwinbernadus-nocodb-mcp-server-badge.jpg)](https://mseep.ai/app/edwinbernadus-nocodb-mcp-server)
 
-# NocoDB MCP Server
+# Nocodb MCP Server
 
 [![smithery badge](https://smithery.ai/badge/@edwinbernadus/nocodb-mcp-server)](https://smithery.ai/server/@edwinbernadus/nocodb-mcp-server)
 
