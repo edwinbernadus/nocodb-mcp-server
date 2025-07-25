@@ -257,6 +257,82 @@ export async function createTable(tableName: string, data: TableColumnType[]) {
     }
 }
 
+export async function listLinkedRecords(tableId: string, linkFieldId: string, recordId: string, fields?: string, sort?: string, where?: string, offset?: number, limit?: number) {
+    try {
+        const paramsArray = []
+        if (fields) {
+            paramsArray.push(`fields=${fields}`);
+        }
+        if (sort) {
+            paramsArray.push(`sort=${sort}`);
+        }
+        if (where) {
+            paramsArray.push(`where=${where}`);
+        }
+        if (offset) {
+            paramsArray.push(`offset=${offset}`);
+        }
+        if (limit) {
+            paramsArray.push(`limit=${limit}`);
+        }
+
+        const queryString = paramsArray.join("&");
+        const url = `/api/v2/tables/${tableId}/links/${linkFieldId}/records/${recordId}${queryString ? `?${queryString}` : ''}`;
+        const response = await nocodbClient.get(url);
+        return {
+            input: {
+                tableId,
+                linkFieldId,
+                recordId,
+                fields,
+                sort,
+                where,
+                offset,
+                limit
+            },
+            output: response.data
+        };
+    } catch (error: any) {
+        throw new Error(`Error listing linked records: ${error.message}`);
+    }
+}
+
+export async function createLink(tableId: string, linkFieldId: string, recordId: string, linkRecordIds: number[]) {
+    try {
+        const payload = linkRecordIds.map(id => ({ Id: id }));
+        const response = await nocodbClient.post(`/api/v2/tables/${tableId}/links/${linkFieldId}/records/${recordId}`, payload);
+        return {
+            input: {
+                tableId,
+                linkFieldId,
+                recordId,
+                linkRecordIds
+            },
+            output: response.data
+        };
+    } catch (error: any) {
+        throw new Error(`Error creating link: ${error.message}`);
+    }
+}
+
+export async function deleteLink(tableId: string, linkFieldId: string, recordId: string, linkRecordIds: number[]) {
+    try {
+        const payload = linkRecordIds.map(id => ({ Id: id }));
+        const response = await nocodbClient.delete(`/api/v2/tables/${tableId}/links/${linkFieldId}/records/${recordId}`, { data: payload });
+        return {
+            input: {
+                tableId,
+                linkFieldId,
+                recordId,
+                linkRecordIds
+            },
+            output: response.data
+        };
+    } catch (error: any) {
+        throw new Error(`Error deleting link: ${error.message}`);
+    }
+}
+
 
 // Create an MCP server
 const server = new McpServer({
@@ -399,12 +475,28 @@ const response = await postRecords("Shinobi", {
             rowId: z.number(),
             data: z.any().describe(`The data to be updated in the table.
 [WARNING] The structure of this object should match the columns of the table.
+[WARNING] Do not use JavaScript-style Object with Stringified Data
 example:
 const response = await patchRecords("Shinobi", 2, {
             Title: "sasuke-updated"
 })`)
         },
         async ({tableName, rowId, data}) => {
+            if (typeof data === 'string'){
+                try {
+                    data = JSON.parse(data);
+                } catch (e) {
+                    return {
+                        content: [{
+                            type: 'text',
+                            mimeType: 'application/json',
+                            text: JSON.stringify({
+                                error: "Data must be a valid JSON object or stringified JSON object"
+                            }),
+                        }],
+                    }
+                }
+            }
             const response = await patchRecords(tableName, rowId, data)
             return {
                 content: [{
@@ -547,6 +639,92 @@ const response = await createTable("Shinobi", [
         },
         async ({tableName, data}) => {
             const response = await createTable(tableName, data)
+            return {
+                content: [{
+                    type: 'text',
+                    mimeType: 'application/json',
+                    text: JSON.stringify(response),
+                }],
+            }
+        }
+    );
+
+    server.tool("nocodb-list-links",
+        "Nocodb - List Linked Records" +
+        `
+Get linked records for a specific Link field and Record ID.
+
+Example usage:
+- List all linked records: listLinkedRecords(tableId, linkFieldId, recordId)
+- With specific fields: listLinkedRecords(tableId, linkFieldId, recordId, "field1,field2")
+- With pagination: listLinkedRecords(tableId, linkFieldId, recordId, undefined, undefined, undefined, 10, 25)
+`,
+        {
+            tableId: z.string().describe("Table Identifier"),
+            linkFieldId: z.string().describe("Links Field Identifier corresponding to the relation field Links established between tables"),
+            recordId: z.string().describe("Record Identifier corresponding to the record in this table for which linked records are being fetched"),
+            fields: z.string().optional().describe("Comma-separated list of fields to include in the response. Example: fields=field1,field2"),
+            sort: z.string().optional().describe("Sort fields. Use '-' prefix for descending order. Example: sort=field1,-field2"),
+            where: z.string().optional().describe("Filter conditions. Example: where=(field1,eq,value1)~and(field2,eq,value2)"),
+            offset: z.number().optional().describe("Number of records to skip. Default: 0"),
+            limit: z.number().optional().describe("Maximum number of records to return. Default: all records")
+        },
+        async ({tableId, linkFieldId, recordId, fields, sort, where, offset, limit}) => {
+            const response = await listLinkedRecords(tableId, linkFieldId, recordId, fields, sort, where, offset, limit)
+            return {
+                content: [{
+                    type: 'text',
+                    mimeType: 'application/json',
+                    text: JSON.stringify(response),
+                }],
+            }
+        }
+    );
+
+    server.tool("nocodb-create-link",
+        "Nocodb - Create Link Between Records" +
+        `
+Link records to a specific Link field and Record ID. Existing links will be unaffected.
+
+Example usage:
+- Link single record: createLink(tableId, linkFieldId, recordId, [4])
+- Link multiple records: createLink(tableId, linkFieldId, recordId, [4, 5, 6])
+`,
+        {
+            tableId: z.string().describe("Table Identifier"),
+            linkFieldId: z.string().describe("Links Field Identifier corresponding to the relation field Links established between tables"),
+            recordId: z.string().describe("Record Identifier corresponding to the record in this table for which links are being created"),
+            linkRecordIds: z.array(z.number()).describe("Array of record IDs from the adjacent table to link to this record")
+        },
+        async ({tableId, linkFieldId, recordId, linkRecordIds}) => {
+            const response = await createLink(tableId, linkFieldId, recordId, linkRecordIds)
+            return {
+                content: [{
+                    type: 'text',
+                    mimeType: 'application/json',
+                    text: JSON.stringify(response),
+                }],
+            }
+        }
+    );
+
+    server.tool("nocodb-delete-link",
+        "Nocodb - Delete Link Between Records" +
+        `
+Unlink records from a specific Link field and Record ID. Duplicated and non-existent record IDs will be ignored.
+
+Example usage:
+- Unlink single record: deleteLink(tableId, linkFieldId, recordId, [1])
+- Unlink multiple records: deleteLink(tableId, linkFieldId, recordId, [1, 2, 3])
+`,
+        {
+            tableId: z.string().describe("Table Identifier"),
+            linkFieldId: z.string().describe("Links Field Identifier corresponding to the relation field Links established between tables"),
+            recordId: z.string().describe("Record Identifier corresponding to the record in this table for which links are being removed"),
+            linkRecordIds: z.array(z.number()).describe("Array of record IDs from the adjacent table to unlink from this record")
+        },
+        async ({tableId, linkFieldId, recordId, linkRecordIds}) => {
+            const response = await deleteLink(tableId, linkFieldId, recordId, linkRecordIds)
             return {
                 content: [{
                     type: 'text',

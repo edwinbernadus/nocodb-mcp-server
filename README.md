@@ -6,12 +6,11 @@
 
 ## Introduction
 
-The Nocodb MCP Server enables seamless interaction with a Nocodb database using the Model Context Protocol (MCP). It
-facilitates CRUD (Create, Read, Update, Delete) operations on Nocodb tables.
+The NocoDB MCP Server enables seamless interaction with your NocoDB database using the Model Context Protocol (MCP). This server makes it easy to perform CRUD (Create, Read, Update, Delete) operations on NocoDB tables through natural language commands.
 
 ## Example Prompt
 
-```
+```text
 [Get Records]
 get data from nocodb, table: Shinobi
 
@@ -36,13 +35,13 @@ delete column with name: Age
 
 ## Example Prompt - Upload File
 
-```
+```text
 [Create table]
 from the json files
 put on nocodb database
 table name is TableShinobi
 ```
-json location file in: example_upload.json
+JSON location file in: [example_upload.json](example_upload.json)
 
 ## Example Prompt - Bulk Create Records and Bulk Delete Records
 
@@ -53,15 +52,13 @@ json location file in: example_upload.json
 
 ## About This Fork
 
-This repository is a TypeScript-based fork of [Nocodb-MCP-Server](https://github.com/granthooks/Nocodb-MCP-Server). It
-retains the core functionality while improving maintainability and compatibility with modern TypeScript development
-practices.
+This repository is a TypeScript-based fork of [NocoDB-MCP-Server](https://github.com/granthooks/Nocodb-MCP-Server). It retains the core functionality while improving maintainability and compatibility with modern TypeScript development practices.
 
 ## Setup
 
 Ensure that Node.js and TypeScript are installed, then execute:
 
-```sh
+```bash
 npm install
 npm run build
 ```
@@ -76,7 +73,7 @@ NOCODB_API_TOKEN=your_api_token_here
 NOCODB_BASE_ID=your_base_id_here
 ```
 
-_tips: duplicate from file env.example_
+**Tip:** You can copy the template from [env.example](env.example) and fill in your values.
 
 ### How to Obtain NOCODB_BASE_ID
 
@@ -85,7 +82,7 @@ For example:
 https://app.nocodb.com/#/wi6evls6/pqmob3ammcknma5/maty9c5xkmf4012  
 In this URL format:
 
-```
+```text
 https://app.nocodb.com/#/{USERNAME}/{NOCODB_BASE_ID}/{TABLE_ID}
 ```
 
@@ -112,10 +109,10 @@ Modify `claude_desktop_config.json` to include:
 ## Direct call from CLI
 
 You can directly call the MCP server from the command line:  
-NOCODB_URL, NOCOBD_API_TOKEN, and NOCODB_BASE_ID are required parameters.  
-`NOCODB_URL= https://app.nocodb.com` if you are using nocodb cloud.
+NOCODB_URL, NOCODB_API_TOKEN, and NOCODB_BASE_ID are required parameters.  
+`NOCODB_URL=https://app.nocodb.com` if you are using NocoDB cloud.
 
-```sh
+```bash
 npx -y nocodb-mcp-server {NOCODB_URL} {NOCODB_BASE_ID} {NOCODB_API_TOKEN} 
 ```
 
@@ -123,19 +120,17 @@ npx -y nocodb-mcp-server {NOCODB_URL} {NOCODB_BASE_ID} {NOCODB_API_TOKEN}
 
 To run the tests, execute:
 
-```sh
+```bash
 npx -y @wong2/mcp-cli npx nocodb-mcp-server {NOCODB_URL} {NOCODB_BASE_ID} {NOCODB_API_TOKEN} 
 ```
 
 ## API Functions
 
-```
-read file API_FUNCTION.md for API functions
-```
+For detailed information about available API functions, please refer to [API_FUNCTION.md](API_FUNCTION.md).
 
 ## Project Structure
 
-```
+```text
 /project-root
   ├── src/            # TypeScript source files
   ├── dist/           # Compiled JavaScript output
