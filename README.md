@@ -2,6 +2,7 @@
 
 # Nocodb MCP Server
 
+[![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/edwinbernadus/nocodb-mcp-server)](https://archestra.ai/mcp-catalog/edwinbernadus__nocodb-mcp-server)
 [![smithery badge](https://smithery.ai/badge/@edwinbernadus/nocodb-mcp-server)](https://smithery.ai/server/@edwinbernadus/nocodb-mcp-server)
 
 ## Introduction
