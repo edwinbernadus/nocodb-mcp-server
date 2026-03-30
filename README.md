@@ -55,6 +55,10 @@ JSON location file in: [example_upload.json](example_upload.json)
 
 This repository is a TypeScript-based fork of [NocoDB-MCP-Server](https://github.com/granthooks/Nocodb-MCP-Server). It retains the core functionality while improving maintainability and compatibility with modern TypeScript development practices.
 
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/edwinbernadus-nocodb-mcp-server).
+
 ## Setup
 
 Ensure that Node.js and TypeScript are installed, then execute:
